@@ -112,7 +112,8 @@
       sorts: {},
       sortsKeys: [],
       sortTypes: {},
-      records: null
+      records: null,
+      noSearch: []
     },
     writers: {
       _rowWriter: defaultRowWriter,
@@ -465,6 +466,12 @@
         this.generate($column);
         id = $column.data('dynatable-column');
       }
+
+      // Add column to our noSearch array if data attribute is set
+      if ($column.data('dynatable-no-search')) {
+        settings.dataset.noSearch.push(id);
+      }
+      
       // Add column data to plugin instance
       columns.splice(position, 0, {
         index: position,
@@ -1215,6 +1222,10 @@
         var contains = false;
         // Loop through each attribute of record
         for (attr in record) {
+          // Don't search if attribute is in our noSearch array
+          if (settings.dataset.noSearch.indexOf(attr) > -1) {
+            continue;
+          }          
           if (record.hasOwnProperty(attr)) {
             var attrValue = record[attr];
             if (typeof(attrValue) === "string" && attrValue.toLowerCase().indexOf(queryValue.toLowerCase()) !== -1) {
